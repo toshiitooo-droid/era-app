@@ -1,0 +1,306 @@
+const eras = [
+  {"name":"大化","start":645,"end":650},
+  {"name":"白雉","start":650,"end":654},
+  {"name":"朱鳥","start":686,"end":686},
+  {"name":"大宝","start":701,"end":704},
+  {"name":"慶雲","start":704,"end":708},
+  {"name":"和銅","start":708,"end":715},
+  {"name":"霊亀","start":715,"end":717},
+  {"name":"養老","start":717,"end":724},
+  {"name":"神亀","start":724,"end":729},
+  {"name":"天平","start":729,"end":749},
+  {"name":"天平感宝","start":749,"end":749},
+  {"name":"天平勝宝","start":749,"end":757},
+  {"name":"天平宝字","start":757,"end":765},
+  {"name":"天平神護","start":765,"end":767},
+  {"name":"神護景雲","start":767,"end":770},
+  {"name":"宝亀","start":770,"end":781},
+  {"name":"天応","start":781,"end":782},
+  {"name":"延暦","start":782,"end":806},
+  {"name":"大同","start":806,"end":810},
+  {"name":"弘仁","start":810,"end":824},
+  {"name":"天長","start":824,"end":834},
+  {"name":"承和","start":834,"end":848},
+  {"name":"嘉祥","start":848,"end":851},
+  {"name":"仁寿","start":851,"end":854},
+  {"name":"斉衡","start":854,"end":857},
+  {"name":"天安","start":857,"end":859},
+  {"name":"貞観","start":859,"end":877},
+  {"name":"元慶","start":877,"end":885},
+  {"name":"仁和","start":885,"end":889},
+  {"name":"寛平","start":889,"end":898},
+  {"name":"昌泰","start":898,"end":901},
+  {"name":"延喜","start":901,"end":923},
+  {"name":"延長","start":923,"end":931},
+  {"name":"承平","start":931,"end":938},
+  {"name":"天慶","start":938,"end":947},
+  {"name":"天暦","start":947,"end":957},
+  {"name":"天徳","start":957,"end":961},
+  {"name":"応和","start":961,"end":964},
+  {"name":"康保","start":964,"end":968},
+  {"name":"安和","start":968,"end":970},
+  {"name":"天禄","start":970,"end":973},
+  {"name":"天延","start":973,"end":976},
+  {"name":"貞元","start":976,"end":978},
+  {"name":"天元","start":978,"end":983},
+  {"name":"永観","start":983,"end":985},
+  {"name":"寛和","start":985,"end":987},
+  {"name":"永延","start":987,"end":989},
+  {"name":"永祚","start":989,"end":990},
+  {"name":"正暦","start":990,"end":995},
+  {"name":"長徳","start":995,"end":999},
+  {"name":"長保","start":999,"end":1004},
+  {"name":"寛弘","start":1004,"end":1012},
+  {"name":"長和","start":1012,"end":1017},
+  {"name":"寛仁","start":1017,"end":1021},
+  {"name":"治安","start":1021,"end":1024},
+  {"name":"万寿","start":1024,"end":1028},
+  {"name":"長元","start":1028,"end":1037},
+  {"name":"長暦","start":1037,"end":1040},
+  {"name":"長久","start":1040,"end":1044},
+  {"name":"寛徳","start":1044,"end":1046},
+  {"name":"永承","start":1046,"end":1053},
+  {"name":"天喜","start":1053,"end":1058},
+  {"name":"康平","start":1058,"end":1065},
+  {"name":"治暦","start":1065,"end":1069},
+  {"name":"延久","start":1069,"end":1074},
+  {"name":"承保","start":1074,"end":1077},
+  {"name":"承暦","start":1077,"end":1081},
+  {"name":"永保","start":1081,"end":1084},
+  {"name":"応徳","start":1084,"end":1087},
+  {"name":"寛治","start":1087,"end":1094},
+  {"name":"嘉保","start":1094,"end":1096},
+  {"name":"永長","start":1096,"end":1097},
+  {"name":"承徳","start":1097,"end":1099},
+  {"name":"康和","start":1099,"end":1104},
+  {"name":"長治","start":1104,"end":1106},
+  {"name":"嘉承","start":1106,"end":1108},
+  {"name":"天仁","start":1108,"end":1110},
+  {"name":"天永","start":1110,"end":1113},
+  {"name":"永久","start":1113,"end":1118},
+  {"name":"元永","start":1118,"end":1120},
+  {"name":"保安","start":1120,"end":1124},
+  {"name":"天治","start":1124,"end":1126},
+  {"name":"大治","start":1126,"end":1131},
+  {"name":"天承","start":1131,"end":1132},
+  {"name":"長承","start":1132,"end":1135},
+  {"name":"保延","start":1135,"end":1141},
+  {"name":"永治","start":1141,"end":1142},
+  {"name":"康治","start":1142,"end":1144},
+  {"name":"天養","start":1144,"end":1145},
+  {"name":"久安","start":1145,"end":1151},
+  {"name":"仁平","start":1151,"end":1154},
+  {"name":"久寿","start":1154,"end":1156},
+  {"name":"保元","start":1156,"end":1159},
+  {"name":"平治","start":1159,"end":1160},
+  {"name":"永暦","start":1160,"end":1161},
+  {"name":"応保","start":1161,"end":1163},
+  {"name":"長寛","start":1163,"end":1165},
+  {"name":"永万","start":1165,"end":1166},
+  {"name":"仁安","start":1166,"end":1169},
+  {"name":"嘉応","start":1169,"end":1171},
+  {"name":"承安","start":1171,"end":1175},
+  {"name":"安元","start":1175,"end":1177},
+  {"name":"治承","start":1177,"end":1181},
+  {"name":"養和","start":1181,"end":1182},
+  {"name":"寿永","start":1182,"end":1184},
+  {"name":"元暦","start":1184,"end":1185},
+  {"name":"文治","start":1185,"end":1190},
+  {"name":"建久","start":1190,"end":1199},
+  {"name":"正治","start":1199,"end":1201},
+  {"name":"建仁","start":1201,"end":1204},
+  {"name":"元久","start":1204,"end":1206},
+  {"name":"建永","start":1206,"end":1207},
+  {"name":"承元","start":1207,"end":1211},
+  {"name":"建暦","start":1211,"end":1213},
+  {"name":"建保","start":1213,"end":1219},
+  {"name":"承久","start":1219,"end":1222},
+  {"name":"貞応","start":1222,"end":1224},
+  {"name":"元仁","start":1224,"end":1225},
+  {"name":"嘉禄","start":1225,"end":1227},
+  {"name":"安貞","start":1227,"end":1229},
+  {"name":"寛喜","start":1229,"end":1232},
+  {"name":"貞永","start":1232,"end":1233},
+  {"name":"天福","start":1233,"end":1234},
+  {"name":"文暦","start":1234,"end":1235},
+  {"name":"嘉禎","start":1235,"end":1238},
+  {"name":"暦仁","start":1238,"end":1239},
+  {"name":"延応","start":1239,"end":1240},
+  {"name":"仁治","start":1240,"end":1243},
+  {"name":"寛元","start":1243,"end":1247},
+  {"name":"宝治","start":1247,"end":1249},
+  {"name":"建長","start":1249,"end":1256},
+  {"name":"康元","start":1256,"end":1257},
+  {"name":"正嘉","start":1257,"end":1259},
+  {"name":"正元","start":1259,"end":1260},
+  {"name":"文応","start":1260,"end":1261},
+  {"name":"弘長","start":1261,"end":1264},
+  {"name":"文永","start":1264,"end":1275},
+  {"name":"建治","start":1275,"end":1278},
+  {"name":"弘安","start":1278,"end":1288},
+  {"name":"正応","start":1288,"end":1293},
+  {"name":"永仁","start":1293,"end":1299},
+  {"name":"正安","start":1299,"end":1302},
+  {"name":"乾元","start":1302,"end":1303},
+  {"name":"嘉元","start":1303,"end":1307},
+  {"name":"徳治","start":1307,"end":1308},
+  {"name":"延慶","start":1308,"end":1311},
+  {"name":"応長","start":1311,"end":1312},
+  {"name":"正和","start":1312,"end":1317},
+  {"name":"文保","start":1317,"end":1319},
+  {"name":"元応","start":1319,"end":1321},
+  {"name":"元亨","start":1321,"end":1324},
+  {"name":"正中","start":1324,"end":1326},
+  {"name":"嘉暦","start":1326,"end":1329},
+  {"name":"元徳","start":1329,"end":1331},
+  {"name":"元弘","start":1331,"end":1334},
+  {"name":"建武","start":1334,"end":1338},
+  {"name":"延元","start":1336,"end":1340},
+  {"name":"興国","start":1340,"end":1346},
+  {"name":"正平","start":1346,"end":1370},
+  {"name":"建徳","start":1370,"end":1372},
+  {"name":"文中","start":1372,"end":1375},
+  {"name":"天授","start":1375,"end":1379},
+  {"name":"弘和","start":1381,"end":1384},
+  {"name":"元中","start":1384,"end":1392},
+  {"name":"暦応","start":1338,"end":1342},
+  {"name":"康永","start":1342,"end":1345},
+  {"name":"貞和","start":1345,"end":1350},
+  {"name":"観応","start":1350,"end":1352},
+  {"name":"文和","start":1352,"end":1356},
+  {"name":"延文","start":1356,"end":1361},
+  {"name":"康安","start":1361,"end":1362},
+  {"name":"貞治","start":1362,"end":1368},
+  {"name":"応安","start":1368,"end":1375},
+  {"name":"永和","start":1375,"end":1379},
+  {"name":"康暦","start":1379,"end":1381},
+  {"name":"永徳","start":1381,"end":1384},
+  {"name":"至徳","start":1384,"end":1387},
+  {"name":"嘉慶","start":1387,"end":1389},
+  {"name":"康応","start":1389,"end":1390},
+  {"name":"明徳","start":1390,"end":1394},
+  {"name":"応永","start":1394,"end":1428},
+  {"name":"正長","start":1428,"end":1429},
+  {"name":"永享","start":1429,"end":1441},
+  {"name":"嘉吉","start":1441,"end":1444},
+  {"name":"文安","start":1444,"end":1449},
+  {"name":"宝徳","start":1449,"end":1452},
+  {"name":"享徳","start":1452,"end":1455},
+  {"name":"康正","start":1455,"end":1457},
+  {"name":"長禄","start":1457,"end":1460},
+  {"name":"寛正","start":1460,"end":1466},
+  {"name":"文正","start":1466,"end":1467},
+  {"name":"応仁","start":1467,"end":1469},
+  {"name":"文明","start":1469,"end":1487},
+  {"name":"長享","start":1487,"end":1489},
+  {"name":"延徳","start":1489,"end":1492},
+  {"name":"明応","start":1492,"end":1501},
+  {"name":"文亀","start":1501,"end":1504},
+  {"name":"永正","start":1504,"end":1521},
+  {"name":"大永","start":1521,"end":1528},
+  {"name":"享禄","start":1528,"end":1532},
+  {"name":"天文","start":1532,"end":1555},
+  {"name":"弘治","start":1555,"end":1558},
+  {"name":"永禄","start":1558,"end":1570},
+  {"name":"元亀","start":1570,"end":1573},
+  {"name":"天正","start":1573,"end":1592},
+  {"name":"文禄","start":1592,"end":1596},
+  {"name":"慶長","start":1596,"end":1615},
+  {"name":"元和","start":1615,"end":1624},
+  {"name":"寛永","start":1624,"end":1644},
+  {"name":"正保","start":1644,"end":1648},
+  {"name":"慶安","start":1648,"end":1652},
+  {"name":"承応","start":1652,"end":1655},
+  {"name":"明暦","start":1655,"end":1658},
+  {"name":"万治","start":1658,"end":1661},
+  {"name":"寛文","start":1661,"end":1673},
+  {"name":"延宝","start":1673,"end":1681},
+  {"name":"天和","start":1681,"end":1684},
+  {"name":"貞享","start":1684,"end":1688},
+  {"name":"元禄","start":1688,"end":1704},
+  {"name":"宝永","start":1704,"end":1711},
+  {"name":"正徳","start":1711,"end":1716},
+  {"name":"享保","start":1716,"end":1736},
+  {"name":"元文","start":1736,"end":1741},
+  {"name":"寛保","start":1741,"end":1744},
+  {"name":"延享","start":1744,"end":1748},
+  {"name":"寛延","start":1748,"end":1751},
+  {"name":"宝暦","start":1751,"end":1764},
+  {"name":"明和","start":1764,"end":1772},
+  {"name":"安永","start":1772,"end":1781},
+  {"name":"天明","start":1781,"end":1789},
+  {"name":"寛政","start":1789,"end":1801},
+  {"name":"享和","start":1801,"end":1804},
+  {"name":"文化","start":1804,"end":1818},
+  {"name":"文政","start":1818,"end":1830},
+  {"name":"天保","start":1830,"end":1844},
+  {"name":"弘化","start":1844,"end":1848},
+  {"name":"嘉永","start":1848,"end":1854},
+  {"name":"安政","start":1854,"end":1860},
+  {"name":"万延","start":1860,"end":1861},
+  {"name":"文久","start":1861,"end":1864},
+  {"name":"元治","start":1864,"end":1865},
+  {"name":"慶応","start":1865,"end":1868},
+  {"name":"明治","start":1868,"end":1912},
+  {"name":"大正","start":1912,"end":1926},
+  {"name":"昭和","start":1926,"end":1989},
+  {"name":"平成","start":1989,"end":2019},
+  {"name":"令和","start":2019,"end":9999}
+];
+
+// セレクトボックスへ元号を入れる
+window.addEventListener("DOMContentLoaded", () => {
+  const select = document.getElementById("eraSelect");
+  eras.forEach(e => {
+    const op = document.createElement("option");
+    op.value = e.name;
+    op.textContent = e.name;
+    select.appendChild(op);
+  });
+});
+
+// 元号 → 西暦
+function toAD() {
+  const name = document.getElementById("eraSelect").value;
+  const y = Number(document.getElementById("eraYear").value);
+
+  if (!y) {
+    show("年を入力してください");
+    return;
+  }
+
+  const era = eras.find(e => e.name === name);
+  const ad = era.start + y - 1;
+  // ★ここから追加：その年が元号の範囲に収まっているかチェック
+  if (ad > era.end) {
+    const lastYear = era.end - era.start + 1; // その元号の最終年
+    show(`${era.name}は ${lastYear}年までしかありません`);
+    return;
+  }
+  // ★追加ここまで
+  show(`${era.name}${y}年 = 西暦 ${ad} 年`);
+}
+
+// 西暦 → 元号
+function toEra() {
+  const ad = Number(document.getElementById("adYear").value);
+  if (!ad) {
+    show("西暦を入力してください");
+    return;
+  }
+
+  const era = eras.find(e => ad >= e.start && ad <= e.end);
+  if (!era) {
+    show("該当する元号がありません");
+    return;
+  }
+
+  const eraYear = ad - era.start + 1;
+  const yearText = eraYear === 1 ? "元" : eraYear;
+
+  show(`西暦 ${ad} 年 = ${era.name}${yearText}年`);
+}
+
+function show(text) {
+  document.getElementById("result").textContent = text;
+}
