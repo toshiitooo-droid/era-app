@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>全元号 ⇔ 西暦 変換</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+
+        <h1>全元号 ⇔ 西暦 変換アプリ</h1>
+
+        <section>
+            <h2>元号 → 西暦</h2>
+            <div class="row">
+                <select id="eraSelect"></select>
+                <input id="eraYear" type="number" placeholder="年">
+                <button onclick="toAD()">変換</button>
+            </div>
+        </section>
+
+        <section>
+            <h2>西暦 → 元号</h2>
+            <div class="row">
+                <input id="adYear" type="number" placeholder="西暦">
+                <button onclick="toEra()">変換</button>
+            </div>
+        </section>
+
+        <div id="result" class="result">ここに結果が表示されます</div>
+
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
