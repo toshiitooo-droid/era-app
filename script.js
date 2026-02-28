@@ -259,25 +259,22 @@ window.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// 元号 → 西暦
 function toAD() {
   const name = document.getElementById("eraSelect").value;
   const y = Number(document.getElementById("eraYear").value);
-
   if (!y) {
     show("年を入力してください");
     return;
   }
-
   const era = eras.find(e => e.name === name);
   const ad = era.start + y - 1;
-  // ★ここから追加：その年が元号の範囲に収まっているかチェック
+  // ★★ 追加：存在しない年をチェック ★★
   if (ad > era.end) {
-    const lastYear = era.end - era.start + 1; // その元号の最終年
+    const lastYear = era.end - era.start + 1;
     show(`${era.name}は ${lastYear}年までしかありません`);
     return;
   }
-  // ★追加ここまで
+  // ★★ ここまで追加 ★★
   show(`${era.name}${y}年 = 西暦 ${ad} 年`);
 }
 
