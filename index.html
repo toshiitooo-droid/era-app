@@ -295,6 +295,36 @@
     letter-spacing: 0.1em;
   }
 
+  .copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 18px;
+    padding: 8px 20px;
+    background: none;
+    border: 1px solid var(--light-gray);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.25em;
+    color: var(--gray);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .copy-btn:hover {
+    border-color: var(--gold);
+    color: var(--ink);
+  }
+
+  .copy-btn.copied {
+    border-color: #4a8c5c;
+    color: #4a8c5c;
+  }
+
+  .copy-btn svg {
+    flex-shrink: 0;
+  }
+
   /* エラー・注記 */
   .notice {
     background: #fff8f7;
@@ -453,6 +483,10 @@
       <div class="result-label">RESULT — 西暦</div>
       <div class="result-main" id="result-nengo-val"></div>
       <div class="result-sub" id="result-nengo-sub"></div>
+      <button class="copy-btn" onclick="copyResult('result-nengo')" id="copy-btn-nengo">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        コピー
+      </button>
     </div>
   </div>
 
@@ -471,6 +505,10 @@
       <div class="result-label">RESULT — 年号</div>
       <div class="result-main" id="result-seireki-val"></div>
       <div class="result-sub" id="result-seireki-sub"></div>
+      <button class="copy-btn" onclick="copyResult('result-seireki')" id="copy-btn-seireki">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        コピー
+      </button>
     </div>
   </div>
 
@@ -751,11 +789,11 @@ const ERAS = [
 
 // 近代以降（明治〜）は一世一元で厳密管理
 const MODERN_ERAS = [
-  { name: "令和", yomi: "れいわ",      startYear: 2019, startMonth:  5, endYear: null,  maxNen: null, period: "近代" },
-  { name: "平成", yomi: "へいせい",    startYear: 1989, startMonth:  1, endYear: 2019, maxNen: 31,   period: "近代" },
-  { name: "昭和", yomi: "しょうわ",    startYear: 1926, startMonth: 12, endYear: 1989, maxNen: 64,   period: "近代" },
-  { name: "大正", yomi: "たいしょう",  startYear: 1912, startMonth:  8, endYear: 1926, maxNen: 15,   period: "近代" },
   { name: "明治", yomi: "めいじ",      startYear: 1868, startMonth: 10, endYear: 1912, maxNen: 45,   period: "近代" },
+  { name: "大正", yomi: "たいしょう",  startYear: 1912, startMonth:  8, endYear: 1926, maxNen: 15,   period: "近代" },
+  { name: "昭和", yomi: "しょうわ",    startYear: 1926, startMonth: 12, endYear: 1989, maxNen: 64,   period: "近代" },
+  { name: "平成", yomi: "へいせい",    startYear: 1989, startMonth:  1, endYear: 2019, maxNen: 31,   period: "近代" },
+  { name: "令和", yomi: "れいわ",      startYear: 2019, startMonth:  5, endYear: null,  maxNen: null, period: "近代" },
 ];
 
 // 時代区分の表示順
@@ -960,6 +998,46 @@ function convertSeirekiToNengo() {
     }
     showResult('result-seireki', `${era.name}${nen}年`, sub);
   }
+}
+
+function copyResult(id) {
+  const box  = document.getElementById(id);
+  const main = box.querySelector('.result-main').textContent;
+  const sub  = box.querySelector('.result-sub').textContent;
+  const text = sub ? `${main}（${sub}）` : main;
+  const btn  = box.querySelector('.copy-btn');
+
+  // 主結果（大きい数字・年号）のみコピー
+  const copyText = main;
+
+  function onCopied() {
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> コピー済';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('copied'); }, 2000);
+  }
+
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(copyText).then(onCopied).catch(() => fallbackCopy(copyText, onCopied));
+  } else {
+    fallbackCopy(copyText, onCopied);
+  }
+}
+
+function fallbackCopy(text, onCopied) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none;';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try {
+    document.execCommand('copy');
+    onCopied();
+  } catch(e) {
+    alert('コピーできませんでした。手動でコピーしてください。');
+  }
+  document.body.removeChild(ta);
 }
 
 function showNotice(el, msg) {
