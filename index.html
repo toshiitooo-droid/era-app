@@ -818,7 +818,7 @@ function buildSelectOptions() {
   // 近代
   const modGroup = document.createElement('optgroup');
   modGroup.label = '近代（明治〜）';
-  MODERN_ERAS.forEach(e => {
+  MODERN_ERAS.slice().reverse().forEach(e => {
     const opt = document.createElement('option');
     opt.value = e.name;
     opt.textContent = `${e.name}（${e.yomi}）`;
