@@ -807,7 +807,7 @@ function buildSelectOptions() {
 // 年号→西暦
 function convertNengoToSeireki() {
   const rawVal = document.getElementById('era-select').value;
-  const nenInput = parseInt(document.getElementById('era-year').value);
+  const rawNen = parseInt(document.getElementById('era-year').value);
   const noticeEl = document.getElementById('notice-nengo');
   const resultEl = document.getElementById('result-nengo');
 
@@ -815,7 +815,7 @@ function convertNengoToSeireki() {
   resultEl.classList.remove('visible');
 
   if (!rawVal) { showNotice(noticeEl, '年号を選択してください。'); return; }
-  if (!nenInput || nenInput < 1 || isNaN(nenInput)) { showNotice(noticeEl, '年（1以上の整数）を入力してください。'); return; }
+  const nenInput = (!rawNen || isNaN(rawNen) || rawNen < 1) ? 1 : rawNen;
 
   const eraName = rawVal.includes('|') ? rawVal.split('|')[0] : rawVal;
 
