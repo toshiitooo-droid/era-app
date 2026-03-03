@@ -653,9 +653,10 @@ const ERAS = [
   { name: "元徳",     yomi: "げんとく",         start: 1329, end: 1331, period: "鎌倉" },
   { name: "元弘",     yomi: "げんこう",         start: 1331, end: 1334, period: "鎌倉" },
   { name: "正慶",     yomi: "しょうきょう",     start: 1332, end: 1333, period: "鎌倉" },
-  // 南北朝時代・建武（建武〜康応）
-  // 建武（南北共通）
-  { name: "建武",     yomi: "けんむ",           start: 1334, end: 1336, period: "南北朝（共通）" },
+  // 南北朝時代（建武〜康応）
+  // 建武：南朝は3年（1336年）まで、北朝は5年（1338年）まで
+  { name: "建武",     yomi: "けんむ",           start: 1334, end: 1336, period: "南北朝（南朝）" },
+  { name: "建武",     yomi: "けんむ",           start: 1334, end: 1338, period: "南北朝（北朝）" },
   // 南朝
   { name: "延元",     yomi: "えんげん",         start: 1336, end: 1340, period: "南北朝（南朝）" },
   { name: "興国",     yomi: "こうこく",         start: 1340, end: 1346, period: "南北朝（南朝）" },
@@ -750,15 +751,15 @@ const ERAS = [
 
 // 近代以降（明治〜）は一世一元で厳密管理
 const MODERN_ERAS = [
-  { name: "明治", yomi: "めいじ",      startYear: 1868, endYear: 1912, maxNen: 45,   period: "近代" },
-  { name: "大正", yomi: "たいしょう",  startYear: 1912, endYear: 1926, maxNen: 15,   period: "近代" },
-  { name: "昭和", yomi: "しょうわ",    startYear: 1926, endYear: 1989, maxNen: 64,   period: "近代" },
-  { name: "平成", yomi: "へいせい",    startYear: 1989, endYear: 2019, maxNen: 31,   period: "近代" },
-  { name: "令和", yomi: "れいわ",      startYear: 2019, endYear: null,  maxNen: null, period: "近代" },
+  { name: "明治", yomi: "めいじ",      startYear: 1868, startMonth: 10, endYear: 1912, maxNen: 45,   period: "近代" },
+  { name: "大正", yomi: "たいしょう",  startYear: 1912, startMonth:  8, endYear: 1926, maxNen: 15,   period: "近代" },
+  { name: "昭和", yomi: "しょうわ",    startYear: 1926, startMonth: 12, endYear: 1989, maxNen: 64,   period: "近代" },
+  { name: "平成", yomi: "へいせい",    startYear: 1989, startMonth:  1, endYear: 2019, maxNen: 31,   period: "近代" },
+  { name: "令和", yomi: "れいわ",      startYear: 2019, startMonth:  5, endYear: null,  maxNen: null, period: "近代" },
 ];
 
 // 時代区分の表示順
-const PERIOD_ORDER = ["近代", "江戸", "室町", "南北朝（北朝）", "南北朝（南朝）", "南北朝（共通）", "鎌倉", "平安", "奈良"];
+const PERIOD_ORDER = ["近代", "江戸", "室町", "南北朝（北朝）", "南北朝（南朝）", "鎌倉", "平安", "奈良"];
 // 時代区分の色（背景）
 const PERIOD_COLORS = {
   "近代":         "#2c2c2c",
@@ -766,7 +767,7 @@ const PERIOD_COLORS = {
   "室町":         "#3a3020",
   "南北朝（北朝）": "#1e3040",
   "南北朝（南朝）": "#402020",
-  "南北朝（共通）": "#302838",
+
   "鎌倉":         "#283830",
   "平安":         "#382838",
   "奈良":         "#383020",
@@ -788,7 +789,7 @@ function buildSelectOptions() {
   sel.appendChild(modGroup);
 
   // 江戸〜奈良を時代ごとにグループ化
-  const periodGroupOrder = ["江戸", "室町", "南北朝（北朝）", "南北朝（南朝）", "南北朝（共通）", "鎌倉", "平安", "奈良"];
+  const periodGroupOrder = ["江戸", "室町", "南北朝（北朝）", "南北朝（南朝）", "鎌倉", "平安", "奈良"];
   periodGroupOrder.forEach(p => {
     const eras = ERAS.filter(e => e.period === p).slice().reverse();
     if (eras.length === 0) return;
@@ -864,14 +865,31 @@ function convertSeirekiToNengo() {
 
   // 近代以降
   if (seireki >= 1868) {
-    const modernEra = MODERN_ERAS.slice().reverse().find(e => {
+    // その西暦年に該当する元号を全て抽出
+    const modernCandidates = MODERN_ERAS.filter(e => {
       const endY = e.maxNen !== null ? e.startYear + e.maxNen - 1 : 9999;
       return seireki >= e.startYear && seireki <= endY;
     });
-    if (modernEra) {
-      const nen = seireki - modernEra.startYear + 1;
+    if (modernCandidates.length > 0) {
+      // 開始年が最も遅いもの（改元後）を主結果に
+      modernCandidates.sort((a, b) => b.startYear - a.startYear);
+      const mainM = modernCandidates[0];
+      const nen = seireki - mainM.startYear + 1;
       const nenStr = nen === 1 ? '元' : String(nen);
-      showResult('result-seireki', `${modernEra.name}${nenStr}年`, `西暦${seireki}年 → ${modernEra.name}${nenStr}年`);
+      let sub = `西暦${seireki}年 → ${mainM.name}${nenStr}年`;
+      // 同年のMODERN_ERAS内の改元前元号
+      const prevMsModern = modernCandidates.slice(1).map(e => {
+        const n = seireki - e.startYear + 1;
+        return `${e.name}${n}年`;
+      });
+      // 同年に終わる旧元号（ERAS側）も拾う — 例：1868年の慶応4年
+      const prevMsOld = ERAS.filter(e => e.end === seireki && seireki > e.start)
+        .map(e => `${e.name}${seireki - e.start + 1}年`);
+      const allPrev = [...prevMsModern, ...prevMsOld];
+      if (allPrev.length > 0) {
+        sub += ` ／ 改元前：${allPrev.join('・')}`;
+      }
+      showResult('result-seireki', `${mainM.name}${nenStr}年`, sub);
       return;
     }
   }
@@ -886,16 +904,62 @@ function convertSeirekiToNengo() {
     showNotice(noticeEl, `西暦${seireki}年に対応する年号が見つかりません。`); return;
   }
 
-  // 最も新しい元号を採用（同期間に複数ある場合は注記）
-  candidates.sort((a, b) => b.start - a.start);
-  const era = candidates[0];
-  const nen = seireki - era.start + 1;
-  let sub = `西暦${seireki}年 → ${era.name}${nen}年（${era.period}）`;
-  if (candidates.length > 1) {
-    const others = candidates.slice(1).map(e => `${e.name}（${e.period}）`).join('、');
-    sub += ` ／ 他の年号：${others}`;
+  // 南北朝期間かどうか判定
+  const isNanbokucho = candidates.some(e => e.period.startsWith('南北朝'));
+
+  let sub;
+  if (isNanbokucho) {
+    // 北朝・南朝それぞれで開始年順にソート（遅い＝改元後が先頭）
+    const hokuchoEras = candidates.filter(e => e.period === '南北朝（北朝）').sort((a,b) => b.start - a.start);
+    const nanchoEras  = candidates.filter(e => e.period === '南北朝（南朝）').sort((a,b) => b.start - a.start);
+    const hokuchoEra = hokuchoEras[0]; // 改元後（主）
+    const nanchoEra  = nanchoEras[0];  // 改元後（主）
+
+    // 改元前の元号（同朝で複数ある場合の残り）
+    const hokuchoPrev = hokuchoEras.slice(1); // 北朝の改元前
+    const nanchoPrev  = nanchoEras.slice(1);  // 南朝の改元前
+
+    if (hokuchoEra) {
+      const nen = seireki - hokuchoEra.start + 1;
+      sub = `西暦${seireki}年 → ${hokuchoEra.name}${nen}年（北朝）`;
+      // 北朝の改元前年号
+      if (hokuchoPrev.length > 0) {
+        const prevStr = hokuchoPrev.map(e => `${e.name}${seireki - e.start + 1}年`).join('・');
+        sub += ` ／ 北朝改元前：${prevStr}`;
+      }
+      // 南朝
+      if (nanchoEra) {
+        const nenN = seireki - nanchoEra.start + 1;
+        sub += ` ／ 南朝：${nanchoEra.name}${nenN}年`;
+        if (nanchoPrev.length > 0) {
+          const prevStr = nanchoPrev.map(e => `${e.name}${seireki - e.start + 1}年`).join('・');
+          sub += `（改元前：${prevStr}）`;
+        }
+      }
+      showResult('result-seireki', `${hokuchoEra.name}${nen}年`, sub);
+    } else if (nanchoEra) {
+      // 北朝元号がない年（南朝のみ）
+      const nen = seireki - nanchoEra.start + 1;
+      sub = `西暦${seireki}年 → ${nanchoEra.name}${nen}年（南朝）`;
+      if (nanchoPrev.length > 0) {
+        const prevStr = nanchoPrev.map(e => `${e.name}${seireki - e.start + 1}年`).join('・');
+        sub += ` ／ 改元前：${prevStr}`;
+      }
+      showResult('result-seireki', `${nanchoEra.name}${nen}年`, sub);
+    }
+  } else {
+    // 通常：最も開始年が新しい元号を採用、同年同startはERAS配列の後ろ（後の改元）を優先
+    const withIdx = candidates.map((e, i) => ({ e, i: ERAS.indexOf(e) }));
+    withIdx.sort((a, b) => b.e.start - a.e.start || b.i - a.i);
+    const era = withIdx[0].e;
+    const nen = seireki - era.start + 1;
+    sub = `西暦${seireki}年 → ${era.name}${nen}年（${era.period}）`;
+    if (withIdx.length > 1) {
+      const prevStr = withIdx.slice(1).map(({e}) => `${e.name}${seireki - e.start + 1}年`).join('・');
+      sub += ` ／ 改元前：${prevStr}`;
+    }
+    showResult('result-seireki', `${era.name}${nen}年`, sub);
   }
-  showResult('result-seireki', `${era.name}${nen}年`, sub);
 }
 
 function showNotice(el, msg) {
@@ -939,29 +1003,80 @@ function toggleEraList() {
 function buildEraTable() {
   const tbody = document.querySelector('#era-table tbody');
 
-  // 時代ごとにセクションを作る
-  PERIOD_ORDER.forEach(period => {
-    let rows = [];
-    if (period === "近代") {
-      rows = MODERN_ERAS.map(e => ({
+  // ブロック定義：表示順に並べる（各ブロック内は西暦降順）
+  const sortDesc = (rows) => rows.sort((a, b) => b.startY - a.startY || b.idx - a.idx);
+
+  const blocks = [
+    {
+      period: "近代",
+      label: "近代",
+      rows: sortDesc(MODERN_ERAS.map((e, i) => ({
         name: e.name, yomi: e.yomi,
         startY: e.startYear,
         endY: e.maxNen !== null ? e.startYear + e.maxNen - 1 : null,
-        period: "近代"
-      }));
-    } else {
-      rows = ERAS.filter(e => e.period === period)
-        .map(e => ({ name: e.name, yomi: e.yomi, startY: e.start, endY: e.end, period: e.period }));
-    }
-    if (rows.length === 0) return;
+        period: "近代", idx: i
+      })))
+    },
+    {
+      period: "江戸",
+      label: "江戸時代",
+      rows: sortDesc(ERAS.filter(e => e.period === '江戸').map(e => ({
+        name: e.name, yomi: e.yomi, startY: e.start, endY: e.end, period: e.period, idx: ERAS.indexOf(e)
+      })))
+    },
+    {
+      period: "室町",
+      label: "室町時代",
+      rows: sortDesc(ERAS.filter(e => e.period === '室町').map(e => ({
+        name: e.name, yomi: e.yomi, startY: e.start, endY: e.end, period: e.period, idx: ERAS.indexOf(e)
+      })))
+    },
+    {
+      period: "南北朝（北朝）",
+      label: "南北朝（北朝）",
+      rows: sortDesc(ERAS.filter(e => e.period === '南北朝（北朝）').map(e => ({
+        name: e.name, yomi: e.yomi, startY: e.start, endY: e.end, period: e.period, idx: ERAS.indexOf(e)
+      })))
+    },
+    {
+      period: "南北朝（南朝）",
+      label: "南北朝（南朝）",
+      rows: sortDesc(ERAS.filter(e => e.period === '南北朝（南朝）').map(e => ({
+        name: e.name, yomi: e.yomi, startY: e.start, endY: e.end, period: e.period, idx: ERAS.indexOf(e)
+      })))
+    },
+    {
+      period: "鎌倉",
+      label: "鎌倉時代",
+      rows: sortDesc(ERAS.filter(e => e.period === '鎌倉').map(e => ({
+        name: e.name, yomi: e.yomi, startY: e.start, endY: e.end, period: e.period, idx: ERAS.indexOf(e)
+      })))
+    },
+    {
+      period: "平安",
+      label: "平安時代",
+      rows: sortDesc(ERAS.filter(e => e.period === '平安').map(e => ({
+        name: e.name, yomi: e.yomi, startY: e.start, endY: e.end, period: e.period, idx: ERAS.indexOf(e)
+      })))
+    },
+    {
+      period: "奈良",
+      label: "奈良時代",
+      rows: sortDesc(ERAS.filter(e => e.period === '奈良').map(e => ({
+        name: e.name, yomi: e.yomi, startY: e.start, endY: e.end, period: e.period, idx: ERAS.indexOf(e)
+      })))
+    },
+  ];
 
+  blocks.forEach(block => {
+    if (block.rows.length === 0) return;
     // ヘッダー行
     const headerTr = document.createElement('tr');
-    const color = PERIOD_COLORS[period] || "#333";
-    headerTr.innerHTML = `<td colspan="5" style="background:${color};color:#f5f0e8;font-weight:600;letter-spacing:0.25em;padding:8px 14px;font-size:0.82rem;">${period}時代</td>`;
+    const color = PERIOD_COLORS[block.period] || "#333";
+    headerTr.innerHTML = `<td colspan="5" style="background:${color};color:#f5f0e8;font-weight:600;letter-spacing:0.25em;padding:8px 14px;font-size:0.82rem;">${block.label}</td>`;
     tbody.appendChild(headerTr);
-
-    rows.forEach(e => {
+    // データ行
+    block.rows.forEach(e => {
       const tr = document.createElement('tr');
       const endStr = e.endY !== null ? `${e.endY}年` : '現在';
       tr.innerHTML = `<td>${e.name}</td><td>${e.yomi}</td><td>${e.startY}年</td><td>${endStr}</td><td class="era-period">${e.period}</td>`;
